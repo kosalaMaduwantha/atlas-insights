@@ -9,15 +9,15 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-import com.sentimentanz.SentimentAnzProcessData.HashtagCSVMapper;
-import com.sentimentanz.SentimentAnzProcessData.HashtagCSVReducer;
+import com.sentimentanz.HashTagPopAnz.HashtagCSVMapper;
+import com.sentimentanz.HashTagPopAnz.HashtagCSVReducer;
 
 import java.io.IOException;
 import java.util.regex.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class SentimentAnzProcessData {
+public class HashTagPopAnz {
 
     public static class HashtagCSVMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         private final static IntWritable one = new IntWritable(1);
@@ -89,7 +89,7 @@ public class SentimentAnzProcessData {
             System.exit(-1);
         }
         Job job = Job.getInstance(conf, "Hashtag CSV Popularity Analysis");
-        job.setJarByClass(SentimentAnzProcessData.class);
+        job.setJarByClass(HashTagPopAnz.class);
         job.setMapperClass(HashtagCSVMapper.class);
         job.setReducerClass(HashtagCSVReducer.class);
 

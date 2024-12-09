@@ -17,8 +17,8 @@ public class SentimentAnzProcessDataTest {
 
     @Before
     public void setUp() {
-        SentimentAnzProcessData.HashtagCSVMapper mapper = new SentimentAnzProcessData.HashtagCSVMapper();
-        SentimentAnzProcessData.HashtagCSVReducer reducer = new SentimentAnzProcessData.HashtagCSVReducer();
+        HashTagPopAnz.HashtagCSVMapper mapper = new HashTagPopAnz.HashtagCSVMapper();
+        HashTagPopAnz.HashtagCSVReducer reducer = new HashTagPopAnz.HashtagCSVReducer();
         mapDriver = MapDriver.newMapDriver(mapper);
         reduceDriver = ReduceDriver.newReduceDriver(reducer);
     }
