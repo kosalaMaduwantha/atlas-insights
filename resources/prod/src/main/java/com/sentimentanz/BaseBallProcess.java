@@ -115,16 +115,41 @@ public class BaseBallProcess {
         public static class ProcessReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
             private IntWritable result = new IntWritable();
+            private String previousTeam;
+            private String previousPeriod;
+            private int maxScore = 0;
+            private boolean isFirstRecord = true;
 
             @Override
             protected void reduce(Text key, Iterable<IntWritable> values, Context context)
                     throws IOException, InterruptedException {
                 int sum = 0;
+                String team = key.toString().split("-")[0];
+                String period = key.toString().split("-")[1];
                 for (IntWritable val : values) {
                     sum += val.get();
                 }
-                result.set(sum);
-                context.write(key, result);
+                if (isFirstRecord) {
+                    isFirstRecord = false;
+                    previousTeam = team;
+                    previousPeriod = period;
+                    maxScore = sum;
+                    logger.warn("Skipping first record: " + key.toString() + " " + sum);
+                    return;
+                }
+                if (team.equals(previousTeam)) {
+                    if (sum >= maxScore) {
+                        maxScore = sum;
+                    }
+                } else {
+                    context.write(new Text(
+                        previousTeam + " team has got the most in the " + period + " quarter " + " | score is: "), 
+                        new IntWritable(maxScore));
+                    previousTeam = team;
+                    previousPeriod = period;
+                    maxScore = sum;
+                }
+                
             }
         
             
