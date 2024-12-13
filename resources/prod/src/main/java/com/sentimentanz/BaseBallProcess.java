@@ -1,5 +1,6 @@
 package com.sentimentanz;
 
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -13,7 +14,15 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 // import input stream 
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+
 import org.apache.commons.io.IOUtils;
+import java.io.File;
+import java.io.IOException;
+import org.apache.hadoop.mapreduce.Mapper.Context;
+import org.json.JSONException;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FSDataOutputStream;
 
 
 
@@ -22,7 +31,9 @@ import org.json.JSONObject;
 import com.sentimentanz.BaseBallProcess.ProcessMapper;
 import com.sentimentanz.BaseBallProcess.ProcessMapper.ProcessReducer;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,12 +44,14 @@ public class BaseBallProcess {
 
     public static class ProcessMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
-        private int teamIndex = 11, periodIndex = 5, scoreIndex = 24, matchIDIndex = 2;
+        private int teamIndex = 11, periodIndex = 5, scoreIndex = 24, matchIDIndex = 2, playerIndex = 6;
         private String contentJsonMapper = null;
         private JSONObject jsonObject = null;
         private int previousScoreMargin = 0;
         private int previousMatchId = 0;
         private boolean isFirstRecord = true;
+        private BufferedWriter csvWriter;
+        private FSDataOutputStream outputStream;
 
         private static String replaceMonthWithNumber(String score, JSONObject jsonObject) {
             for (String key : jsonObject.keySet()) {
@@ -47,6 +60,16 @@ public class BaseBallProcess {
                 }
             }
             return score;
+        }
+
+        @Override
+        public void setup(Context context) throws IOException {
+            FileSystem fs = FileSystem.get(context.getConfiguration());
+            Path outputPath = new Path("/user/hadoop/mapper_output/processed.csv");
+            outputStream = fs.create(outputPath, true);
+            csvWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            csvWriter.write("game_id," + "period_id," + "player_id," + "team," + "score");
+            csvWriter.newLine();
         }
 
         @Override
@@ -78,6 +101,7 @@ public class BaseBallProcess {
                 String period = fields[periodIndex];
                 String score = fields[scoreIndex];
                 String matchID = fields[matchIDIndex];
+                String player = fields[playerIndex];
                 try{
                     String parsedScore = replaceMonthWithNumber(score, jsonObject);
                     int homeScore = Integer.parseInt(parsedScore.split("-")[0]);
@@ -102,6 +126,11 @@ public class BaseBallProcess {
                     }
 
                     int scoreDiff = Math.abs(scoreMargin - previousScoreMargin);
+
+                    // writng to csv
+                    csvWriter.write(matchID + "," + period + "," + player + "," + team + "," + scoreDiff);
+                    csvWriter.newLine();
+
                     context.write(new Text(team + "-" + period), new IntWritable(scoreDiff));
                     previousScoreMargin = scoreMargin;
                 } catch (Exception e) {
@@ -109,6 +138,13 @@ public class BaseBallProcess {
                     e.printStackTrace();
                 }
 
+            }
+        }
+
+        @Override
+        protected void cleanup(Context context) throws IOException {
+            if (csvWriter != null) {
+                csvWriter.close();
             }
         }
 
