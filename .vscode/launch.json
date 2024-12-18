@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug JUnit Test",
+            "request": "launch",
+            "mainClass": "",
+            "projectName": "sentiment-anz-hadoop",
+            "args": "",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "classPaths": [
+                "${workspaceFolder}/resources/prod/src/test/java"
+            ],
+            "modulePaths": []
+        }
+    ]
+}

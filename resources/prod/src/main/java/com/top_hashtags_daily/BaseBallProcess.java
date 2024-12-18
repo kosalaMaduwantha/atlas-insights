@@ -1,4 +1,4 @@
-package com.sentimentanz;
+package com.top_hashtags_daily;
 
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
@@ -28,8 +28,8 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 
 import org.json.JSONObject;
 
-import com.sentimentanz.BaseBallProcess.ProcessMapper;
-import com.sentimentanz.BaseBallProcess.ProcessMapper.ProcessReducer;
+import com.top_hashtags_daily.BaseBallProcess.ProcessMapper;
+import com.top_hashtags_daily.BaseBallProcess.ProcessMapper.ProcessReducer;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

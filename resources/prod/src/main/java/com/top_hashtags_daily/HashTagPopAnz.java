@@ -1,4 +1,4 @@
-package com.sentimentanz;
+package com.top_hashtags_daily;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -8,9 +8,10 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.log4j.Logger;
 
-import com.sentimentanz.HashTagPopAnz.HashtagCSVMapper;
-import com.sentimentanz.HashTagPopAnz.HashtagCSVReducer;
+import com.top_hashtags_daily.HashTagPopAnz.HashtagCSVMapper;
+import com.top_hashtags_daily.HashTagPopAnz.HashtagCSVReducer;
 
 import java.io.IOException;
 import java.util.regex.*;
@@ -18,8 +19,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class HashTagPopAnz {
-
+    
     public static class HashtagCSVMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+        private static final Logger logger = Logger.getLogger(HashtagCSVMapper.class);
         private final static IntWritable one = new IntWritable(1);
         private Text outputKey = new Text();
 
@@ -44,6 +46,8 @@ public class HashTagPopAnz {
 
                     text = URL_PATTERN.matcher(text).replaceAll(""); 
                     text = SPECIAL_CHAR_PATTERN.matcher(text).replaceAll(""); 
+
+                    System.out.println("text: " + text);
 
                     String date = "unknown";
                     try {
@@ -85,7 +89,7 @@ public class HashTagPopAnz {
         
         Configuration conf = new Configuration();
         if (args.length != 2) {
-            System.err.println("Usage: HashtagCSVAnalysis <input path> <output path>");
+            System.err.println("Usage: HashtagCSVAnalysis daily <input path> <output path>");
             System.exit(-1);
         }
         Job job = Job.getInstance(conf, "Hashtag CSV Popularity Analysis");
