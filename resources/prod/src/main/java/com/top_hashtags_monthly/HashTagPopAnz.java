@@ -1,4 +1,4 @@
-package com.top_hashtags_daily;
+package com.top_hashtags_monthly;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -36,9 +36,13 @@ public class HashTagPopAnz {
             if (fields.length >= 4) {
                 try {
                     String date = fields[dateIndex];
+                    String[] dateParts = date.split("-");
+                    String yearMonth = dateParts[0] + "-" + dateParts[1];
+
                     String hashTag = fields[hashIndex];
                     int freqInt = Integer.parseInt(fields[freqIndex].strip());
-                    outputKey.set(date + "\t" + hashTag);
+
+                    outputKey.set(yearMonth + "\t" + hashTag);
                     context.write(outputKey, new IntWritable(freqInt));
                 } catch (Exception e) {
                     String errorMessage = String.format(
@@ -64,7 +68,6 @@ public class HashTagPopAnz {
             context.write(key, result);
         }
     }
-
     public static void main(String[] args) throws Exception {
         
         Configuration conf = new Configuration();
@@ -86,3 +89,4 @@ public class HashTagPopAnz {
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
+    

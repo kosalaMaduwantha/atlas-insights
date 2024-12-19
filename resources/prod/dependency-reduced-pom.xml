@@ -37,9 +37,9 @@
     </dependency>
   </dependencies>
   <properties>
-    <hadoop.version>3.3.4</hadoop.version>
+    <maven.compiler.target>1.7</maven.compiler.target>
     <maven.compiler.source>1.7</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <hadoop.version>3.3.4</hadoop.version>
   </properties>
 </project>
