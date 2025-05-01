@@ -1,7 +1,7 @@
 version: "2"
 services:
   namenode:
-    image: apache/hadoop:3
+    build: .
     platform: linux/amd64
     hostname: namenode
     container_name: namenode
@@ -23,7 +23,7 @@ services:
           cpus: "1.5"  # limit to 1.5 CPU cores
           memory: "2g"  # limit memory to 2GB
   datanode_1:
-    image: apache/hadoop:3
+    build: .
     platform: linux/amd64
     container_name: datanode
     command: [ "hdfs", "datanode" ]
@@ -33,7 +33,7 @@ services:
       - CLUSTER_NAME=test
   
   resourcemanager:
-    image: apache/hadoop:3
+    build: .
     platform: linux/amd64
     hostname: resourcemanager
     container_name: resourcemanager
@@ -54,7 +54,7 @@ services:
           memory: "2g"  # limit memory to 2GB
   
   nodemanager:
-    image: apache/hadoop:3
+    build: .
     platform: linux/amd64
     container_name: nodemanager
     command: [ "yarn", "nodemanager" ]

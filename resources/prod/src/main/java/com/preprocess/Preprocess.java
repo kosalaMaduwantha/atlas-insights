@@ -45,12 +45,17 @@ public class Preprocess {
 
         @Override
         public void setup(Context context) throws IOException {
-            FileSystem fs = FileSystem.get(context.getConfiguration());
-            Path outputPath = new Path("/user/kosala/mapper_output/processed.csv");
-            outputStream = fs.create(outputPath, true);
-            csvWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-            csvWriter.write("id," + "date," + "hash_tag," + "freq,");
-            csvWriter.newLine();
+            try{
+                FileSystem fs = FileSystem.get(context.getConfiguration());
+                Path outputPath = new Path("/user/kosala/mapper_output/processed.csv");
+                outputStream = fs.create(outputPath, true);
+                csvWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                csvWriter.write("id," + "date," + "hash_tag," + "freq,");
+                csvWriter.newLine();
+            } catch (Exception e) {
+                logger.error("Error in setup: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -58,6 +63,17 @@ public class Preprocess {
             String line = value.toString();
             String[] fields = line.split("\",\""); 
             
+            if (fields.length < 6){
+                try{
+                    System.err.println("Invalid line: " + line);
+                    logger.error("Invalid line: " + line);
+                    throw new IOException("Invalid line: " + line);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Error in map: " + e.getMessage());
+                }
+                
+            }
             if (fields.length >= 6) {
                 try {
                     
@@ -77,6 +93,7 @@ public class Preprocess {
                         date = outputDateFormat.format(parsedDate);
                     } catch (Exception e) {
                         // If timestamp parsing fails, use "unknown"
+                        e.printStackTrace();    
                     }
 
                     
@@ -87,7 +104,8 @@ public class Preprocess {
                         csvWriter.newLine();
                     }
                 } catch (Exception e) {
-                    
+                    e.printStackTrace();
+                    logger.error("Error in map: " + e.getMessage());
                 }
             }
         }
