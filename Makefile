@@ -1,6 +1,12 @@
+make-dirs:
+	docker exec -i namenode bash -c "hdfs dfs -mkdir -p /users/kosala/input"
+
+make-dirs-ls:
+	docker exec -i namenode bash -c "hdfs dfs -ls /users/kosala/input"
+
 upload-input:
-	docker exec -it namenode -- bash -c "hdfs dfs -put $(src) $(dst)"
+	docker exec -i namenode bash -c "hdfs dfs -put $(src) $(dst)"
 
 make-output:
-	docker exec -it namenode -- bash -c "hdfs dfs -mkdir $(dst)"
-	
+	docker exec -i namenode bash -c "hdfs dfs -mkdir $(dst)"
+
