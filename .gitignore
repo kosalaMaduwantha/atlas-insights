@@ -2,3 +2,4 @@ resources/prod/data/*
 resources/prod/target/*
 env/
 cache-directory/
+data/

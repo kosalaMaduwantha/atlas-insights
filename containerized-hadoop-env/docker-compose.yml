@@ -8,12 +8,13 @@ services:
     volumes:
       - ./Makefile:/opt/hadoop/Makefile
       - /home/kosala/git-repos/sentiment-anz-hadoop/resources:/opt/hadoop/resources
+      - /home/kosala/git-repos/sentiment-anz-hadoop/data:/opt/hadoop/data
     ports:
       - 9870:9870
     env_file:
       - ./config
     environment:
-      ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+      ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
       HDFS_SITE_XML_dfs.webhdfs.enabled: "true"
       CLUSTER_NAME: "test"
     command: ["hdfs", "namenode"]
