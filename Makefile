@@ -27,3 +27,10 @@ read-output:
 
 read-dir-log:
 	docker exec -i namenode bash -c "hdfs dfs -cat /tmp/logs/$(app_id)/*"
+
+hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-3.4.1.jar \
+  -files src/mapper.py,src/reducer.py \
+  -mapper mapper.py \
+  -reducer reducer.py \
+  -input /user/kosala/input \
+  -output /user/kosala/output
