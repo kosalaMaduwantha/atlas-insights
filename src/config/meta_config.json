@@ -1,0 +1,11 @@
+{
+    "ocs_group_name": "ecommerce_transactions",
+    "source_type": "FS",
+    "source_config": {
+        "path": "/home/kosala/git-repos/atlas-insights/data/e_commerce_transactions_dataset/ecommerce_transactions.csv",
+        "file_format": "csv",
+        "host": "localhost",
+        "port": null,
+        "sec_config":{}
+    }
+}
