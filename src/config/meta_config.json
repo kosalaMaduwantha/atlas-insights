@@ -7,5 +7,42 @@
         "host": "localhost",
         "port": null,
         "sec_config":{}
-    }
+    },
+    "dataset_config":[
+        {
+           "source": {
+                "name": "ecommerce_transactions",
+                "primary_key": "transaction_id",
+                "path": "/home/kosala/git-repos/atlas-insights/data/e_commerce_transactions_dataset/ecommerce_transactions.csv",
+                "features":[
+                    {"name": "transaction_id", "dtype": "int" },
+                    {"name": "product_id", "dtype": "int"},
+                    {"name": "user_id", "dtype": "int"},
+                    {"name": "quantity", "dtype": "int"},
+                    {"name": "price", "dtype": "float"},
+                    {"name": "transaction_date", "dtype": "date"},
+                    {"name": "payment_method", "dtype": "string"},
+                    {"name": "city", "dtype": "string"},
+                    {"name": "country", "dtype": "string"}
+                ]
+            },
+            "transformations": [],
+            "destination": {
+                "name": "ecommerce_transactions",
+                "primary_key": "transaction_id",
+                "path": "/data/warehouse/ecommerce_transactions",
+                "features":[
+                    {"name": "transaction_id", "dtype": "int" },
+                    {"name": "product_id", "dtype": "int"},
+                    {"name": "user_id", "dtype": "int"},
+                    {"name": "quantity", "dtype": "int"},
+                    {"name": "price", "dtype": "float"},
+                    {"name": "transaction_date", "dtype": "date"},
+                    {"name": "payment_method", "dtype": "string"},
+                    {"name": "city", "dtype": "string"},
+                    {"name": "country", "dtype": "string"}
+                ]
+            }
+        }
+    ]
 }
