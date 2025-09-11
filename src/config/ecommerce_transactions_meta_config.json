@@ -1,0 +1,45 @@
+{
+    "ocs_group_name": "ecommerce_transactions",
+    "source_type": "FS",
+    "source_config": {
+        "file_format": "csv",
+        "host": "localhost",
+        "port": null,
+        "sec_config":{}
+    },
+    "dataset_config":[
+        {
+           "source": {
+                "name": "ecommerce_transactions",
+                "primary_key": "transaction_id",
+                "path": "/home/kosala/git-repos/atlas-insights/data/e_commerce_transactions_dataset/ecommerce_transactions.csv",
+                "features":[
+                    {"name": "Transaction_ID", "dtype": "int"},
+                    {"name": "User_Name", "dtype": "string"},
+                    {"name": "Age", "dtype": "int"},
+                    {"name": "Country", "dtype": "string"},
+                    {"name": "Product_Category", "dtype": "string"},
+                    {"name": "Purchase_Amount", "dtype": "float"},
+                    {"name": "Payment_Method", "dtype": "string"},
+                    {"name": "Transaction_Date", "dtype": "date"}
+                ]
+            },
+            "transformations": [],
+            "destination": {
+                "name": "ecommerce_transactions",
+                "primary_key": "transaction_id",
+                "path": "/data/warehouse/ecommerce_transactions",
+                "features":[
+                    {"name": "Transaction_ID", "dtype": "int"},
+                    {"name": "User_Name", "dtype": "string"},
+                    {"name": "Age", "dtype": "int"},
+                    {"name": "Country", "dtype": "string"},
+                    {"name": "Product_Category", "dtype": "string"},
+                    {"name": "Purchase_Amount", "dtype": "float"},
+                    {"name": "Payment_Method", "dtype": "string"},
+                    {"name": "Transaction_Date", "dtype": "date"}
+                ]
+            }
+        }
+    ]
+}
