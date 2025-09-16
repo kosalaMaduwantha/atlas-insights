@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/home/kosala/git-repos/atlas-insights/')
 import pyarrow as pa
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
@@ -8,8 +10,7 @@ from src.config.config import HDFS_HOST, HDFS_PORT
 def csv_to_parquet_hdfs(
         dataset_config: dict,
         hdfs_host=HDFS_HOST, 
-        hdfs_port=HDFS_PORT,
-        hdfs_path='/user/kosala/input',
+        hdfs_port=HDFS_PORT
     ):
     """Convert a local CSV file to Parquet format and upload it to HDFS.
     Args:
@@ -19,6 +20,8 @@ def csv_to_parquet_hdfs(
         hdfs_port (int): Port number of the HDFS namenode.
     """
     for dataset in dataset_config:
+        destination = dataset.get('destination', {})
+        hdfs_path = destination.get('path', '/user/kosala/input')
         source_dataset_config = dataset.get('source', {})
         table = pv.read_csv(source_dataset_config.get('path'))
 
@@ -46,15 +49,14 @@ def invok_e_csv_to_parquet(ocs_name='ecommerce_transactions'):
 
     # Extract relevant info from metadata
     dataset_config = metadata_config.get('dataset_config', [{}])
-    destination = dataset_config.get('destination', {})
+    
     # HDFS path: use destination path
-    hdfs_path = destination.get('path', '/user/kosala/input')
+    
     hdfs_host = HDFS_HOST
     hdfs_port = HDFS_PORT
 
     csv_to_parquet_hdfs(
         dataset_config=dataset_config,
-        hdfs_path=hdfs_path,
         hdfs_host=hdfs_host,
         hdfs_port=hdfs_port
     )
