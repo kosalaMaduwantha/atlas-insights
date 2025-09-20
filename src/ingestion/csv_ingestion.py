@@ -48,9 +48,9 @@ def invok_e_csv_to_parquet(ocs_name='ecommerce_transactions'):
         metadata_config = json.load(f)
 
     # Extract relevant info from metadata
-    dataset_config = metadata_config.get('dataset_config', [{}])
-    
-    # HDFS path: use destination path
+    dataset_config = metadata_config\
+        .get('fs', {})\
+        .get('dataset_config', [{}])
     
     hdfs_host = HDFS_HOST
     hdfs_port = HDFS_PORT
