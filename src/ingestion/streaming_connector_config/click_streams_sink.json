@@ -1,0 +1,11 @@
+{
+  "name": "ecommerce-click-streams-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.hdfs3.Hdfs3SinkConnector",
+    "tasks.max": "3",
+    "topics": "ecommerce_transactions",
+    "hdfs.url": "hdfs://localhost:9000/user/kosala/input/click_streams",
+    "flush.size": "10",
+    "confluent.topic.bootstrap.servers": "localhost:9092"
+  }
+}

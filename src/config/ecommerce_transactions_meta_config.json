@@ -50,7 +50,7 @@
                 "source": {
                     "name": "ecommerce_transactions_stream",
                     "primary_key": "transaction_id",
-                    "path": "ecommerce_transactions_topic",
+                    "path": "ecommerce_transactions",
                     "features":[
                         {"name": "event_time", "dtype": "datetime"},
                         {"name": "event_type", "dtype": "string"},

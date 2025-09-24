@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 from kafka import KafkaProducer
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import HTMLResponse
 
 logging.basicConfig(level=logging.INFO)
@@ -11,7 +11,10 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(
+    websocket: WebSocket,
+    ocs_group: str = Query(None)
+):
     await websocket.accept()
     try:
         while True:
@@ -20,8 +23,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 json_data = json.loads(data)
                 # validate the data
                 metadata_config = {}
-                ocs_name = 'ecommerce_transactions'
-                with open(f'src/config/{ocs_name}_meta_config.json', 'r') as f:
+                meta_data_path = f'src/config/{ocs_group}_meta_config.json'
+                with open(meta_data_path, 'r') as f:
                     metadata_config = json.load(f)
                 dataset_config = metadata_config.get('streaming', {})\
                                                 .get('dataset_config', [{}])
@@ -32,7 +35,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         json_data, source_config)
                     logger.info(f"Validated data: {validated_data}")
                     # publish to Kafka
-                    publish_to_kafka(validated_data, topic=ocs_name)
+                    publish_to_kafka(validated_data, topic=ocs_group)
 
                 response = {"status": "processed", "received": json_data}
             except json.JSONDecodeError:
