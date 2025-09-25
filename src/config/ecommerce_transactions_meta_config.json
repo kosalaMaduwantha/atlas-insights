@@ -75,8 +75,6 @@
             "host": "localhost",
             "port": 5432,
             "database": "ecommerce_db",
-            "username": "admin", 
-            "password": "admin123",
             "sec_config": {}
         },
         "dataset_config": [
