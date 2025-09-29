@@ -10,6 +10,17 @@
       "justMyCode": false
     },
     {
+      "name": "Debug: RDBMS Ingestion Pipeline",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/ingestion/rdbms_ingestion.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "args": [
+        "--ocs", "ecommerce_transactions_rdbms"
+      ]
+    },
+    {
       "type": "java",
       "name": "Debug JUnit Test",
       "request": "launch",

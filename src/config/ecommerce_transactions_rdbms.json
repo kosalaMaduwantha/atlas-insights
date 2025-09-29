@@ -1,0 +1,49 @@
+{
+    "ocs_group_name": "ecommerce_transactions_rdbms",
+    "source_type": "rdbms",
+    "source_config": {
+        "db_type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "database": "ecommerce_db",
+        "sec_config": {
+            "user": "root",
+            "password": "example"
+        }
+    },
+    "dataset_config": [
+        {
+            "source": {
+                "name": "ecommerce_transactions_db",
+                "primary_key": "transaction_id",
+                "path": "ecommerce_transactions",
+                "features":[
+                    {"name": "InvoiceNo", "dtype": "int"},
+                    {"name": "StockCode", "dtype": "string"},
+                    {"name": "Description", "dtype": "string"},
+                    {"name": "Quantity", "dtype": "int"},
+                    {"name": "InvoiceDate", "dtype": "datetime"},
+                    {"name": "UnitPrice", "dtype": "float"},
+                    {"name": "CustomerID", "dtype": "int"},
+                    {"name": "Country", "dtype": "string"}
+                ]
+            },
+            "transformations": [],
+            "destination": {
+                "name": "ecommerce_transactions_warehouse",
+                "primary_key": "transaction_id",
+                "path": "/data/warehouse/ecommerce_transactions_db",
+                "features":[
+                    {"name": "InvoiceNo", "dtype": "int"},
+                    {"name": "StockCode", "dtype": "string"},
+                    {"name": "Description", "dtype": "string"},
+                    {"name": "Quantity", "dtype": "int"},
+                    {"name": "InvoiceDate", "dtype": "datetime"},
+                    {"name": "UnitPrice", "dtype": "float"},
+                    {"name": "CustomerID", "dtype": "int"},
+                    {"name": "Country", "dtype": "string"}
+                ]
+            }
+        }
+    ]
+}

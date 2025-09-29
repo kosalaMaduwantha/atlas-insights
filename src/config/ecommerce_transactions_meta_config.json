@@ -82,7 +82,7 @@
                 "source": {
                     "name": "ecommerce_transactions_db",
                     "primary_key": "transaction_id",
-                    "path": "public.ecommerce_transactions",
+                    "path": "ecommerce_transactions",
                     "features":[
                         {"name": "Transaction_ID", "dtype": "int"},
                         {"name": "User_Name", "dtype": "string"},
