@@ -25,10 +25,6 @@ from src.config.config import HDFS_HOST, HDFS_PORT
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s - %(message)s')
 
-# ----------------------------------------------------------------------------
-# Public API
-# ----------------------------------------------------------------------------
-
 def ingest_rdbms_to_parquet(
 	metadata: Dict,
 	ocs_group: str,
