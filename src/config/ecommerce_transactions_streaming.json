@@ -1,0 +1,30 @@
+{
+    "ocs_group_name": "ecommerce_transactions_streaming",
+    "source_type": "streaming",
+    "source_config": {
+        "sec_config": {}
+    },
+    "dataset_config": [
+        {
+            "source": {
+                "name": "ecommerce_transactions_stream",
+                "primary_key": "transaction_id",
+                "path": "ecommerce_transactions",
+                "features":[
+                    {"name": "event_time", "dtype": "datetime"},
+                    {"name": "event_type", "dtype": "string"},
+                    {"name": "product_id", "dtype": "int"},
+                    {"name": "category_id", "dtype": "int"},
+                    {"name": "category_code", "dtype": "string"},
+                    {"name": "brand", "dtype": "string"},
+                    {"name": "price", "dtype": "float"},
+                    {"name": "user_id", "dtype": "int"},
+                    {"name": "user_session", "dtype": "string"}
+                ]
+            },
+            "transformations": [],
+            "destination": {}
+        }
+    ]
+    
+}

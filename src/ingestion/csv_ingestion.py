@@ -40,17 +40,15 @@ def csv_to_parquet_hdfs(
             source_dataset_config.get('name') + '.parquet') as out_stream:
             out_stream.write(parquet_buffer.to_pybytes())
 
-def invok_e_csv_to_parquet(ocs_name='ecommerce_transactions'):
+def invok_e_csv_to_parquet(ocs_name='ecommerce_transactions_fs'):
     """Invoke the CSV to Parquet conversion with example parameters."""
     
     metadata_config = {}
-    with open(f'src/config/{ocs_name}_meta_config.json', 'r') as f:
+    with open(f'src/config/{ocs_name}.json', 'r') as f:
         metadata_config = json.load(f)
 
     # Extract relevant info from metadata
-    dataset_config = metadata_config\
-        .get('fs', {})\
-        .get('dataset_config', [{}])
+    dataset_config = metadata_config.get('dataset_config', [{}])
     
     hdfs_host = HDFS_HOST
     hdfs_port = HDFS_PORT

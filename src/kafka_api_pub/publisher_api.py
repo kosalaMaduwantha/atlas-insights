@@ -23,11 +23,10 @@ async def websocket_endpoint(
                 json_data = json.loads(data)
                 # validate the data
                 metadata_config = {}
-                meta_data_path = f'src/config/{ocs_group}_meta_config.json'
+                meta_data_path = f'src/config/{ocs_group}.json'
                 with open(meta_data_path, 'r') as f:
                     metadata_config = json.load(f)
-                dataset_config = metadata_config.get('streaming', {})\
-                                                .get('dataset_config', [{}])
+                dataset_config = metadata_config.get('dataset_config', [{}])
                 for config in dataset_config:
                     source_config = config.get('source', {})\
                                           .get('features', [])
