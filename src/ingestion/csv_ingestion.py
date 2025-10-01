@@ -1,65 +1,75 @@
+
 import sys
 sys.path.append('/home/kosala/git-repos/atlas-insights/')
 import pyarrow as pa
 import pyarrow.csv as pv
-import pyarrow.parquet as pq
-import pyarrow.fs as pafs
-import json
+import logging
 from src.config.config import HDFS_HOST, HDFS_PORT
+from src.utils.common_util_func import build_schema, load_metadata
+from src.providers.hdfs_service import write_parquet_dataset
+import os
+import json
 
-def csv_to_parquet_hdfs(
-        dataset_config: dict,
-        hdfs_host=HDFS_HOST, 
-        hdfs_port=HDFS_PORT
-    ):
-    """Convert a local CSV file to Parquet format and upload it to HDFS.
-    Args:
-        dataset_config (dict): Configuration dictionary containing dataset details.
-        hdfs_path (str): HDFS directory path where the Parquet file will be stored.
-        hdfs_host (str): Hostname of the HDFS namenode.
-        hdfs_port (int): Port number of the HDFS namenode.
-    """
-    for dataset in dataset_config:
-        destination = dataset.get('destination', {})
-        hdfs_path = destination.get('path', '/user/kosala/input')
-        source_dataset_config = dataset.get('source', {})
-        table = pv.read_csv(source_dataset_config.get('path'))
 
-        # filter columns defined in columns_to_keep in metadata
-        filtered_table = table.select([col.get('name') for col in \
-            source_dataset_config.get('features', [])])
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s - %(message)s')
+
+def ingest_csv_to_parquet(
+    metadata: dict,
+    ocs_group: str,
+    hdfs_host: str = HDFS_HOST,
+    hdfs_port: int = HDFS_PORT,
+):
+    """Ingest all datasets defined in metadata from CSV to HDFS Parquet using utility functions."""
+    for ds in metadata.get('dataset_config', []):
+        source = ds.get('source', {})
+        destination = ds.get('destination', {})
+        dataset_name = source.get('name', ocs_group)
+        csv_path = source.get('path')
+        features = source.get('features', [])
+        column_names = [f['name'] for f in features]
         
-        # convert to parquet in memory
-        sink = pa.BufferOutputStream()
-        pq.write_table(filtered_table, sink)
-        parquet_buffer = sink.getvalue()
+        schema = build_schema(features)
+        dest_path = destination.get('path')
+        if not dest_path:
+            raise ValueError('Destination path not specified in metadata')
 
-        hdfs = pafs.HadoopFileSystem(
-            host=hdfs_host, port=hdfs_port)
-        with hdfs.open_output_stream(hdfs_path + '/' + \
-            source_dataset_config.get('name') + '.parquet') as out_stream:
-            out_stream.write(parquet_buffer.to_pybytes())
+        logger.info(
+            'Starting CSV ingestion dataset=%s csv=%s columns=%s -> %s', dataset_name, csv_path, len(column_names), dest_path
+        )
 
-def invok_e_csv_to_parquet(ocs_name='ecommerce_transactions_fs'):
-    """Invoke the CSV to Parquet conversion with example parameters."""
-    
-    metadata_config = {}
-    with open(f'src/config/{ocs_name}.json', 'r') as f:
-        metadata_config = json.load(f)
+        table = pv.read_csv(csv_path)
+        filtered_table = table.select(column_names)
+        # Convert filtered_table to batches of dicts for write_parquet_dataset
+        batch_dicts = [dict(zip(filtered_table.schema.names, row)) for row in zip(*[filtered_table.column(i).to_pylist() for i in range(filtered_table.num_columns)])]
+        # Wrap in a list to match Iterable[List[Dict]]
+        batches = [batch_dicts]
 
-    # Extract relevant info from metadata
-    dataset_config = metadata_config.get('dataset_config', [{}])
-    
-    hdfs_host = HDFS_HOST
-    hdfs_port = HDFS_PORT
+        write_parquet_dataset(
+            batches=batches,
+            schema=schema,
+            dataset_name=dataset_name,
+            destination_path=dest_path,
+            hdfs_host=hdfs_host,
+            hdfs_port=hdfs_port,
+        )
 
-    csv_to_parquet_hdfs(
-        dataset_config=dataset_config,
-        hdfs_host=hdfs_host,
-        hdfs_port=hdfs_port
-    )
+        logger.info('Finished dataset=%s', dataset_name)
 
-# Example usage:
+
+def invoke_csv_ingestion(ocs_group: str = 'ecommerce_transactions_fs'):
+    metadata = load_metadata(ocs_group)
+    ingest_csv_to_parquet(metadata=metadata, ocs_group=ocs_group)
+
+
 if __name__ == "__main__":
-    invok_e_csv_to_parquet()
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Ingest CSV dataset(s) defined by metadata JSON to Parquet on HDFS.')
+    parser.add_argument('--ocs', '--ocs-group', dest='ocs_group', default='ecommerce_transactions_fs', help='OCS group / metadata JSON name (without .json)')
+    args = parser.parse_args()
+
+    metadata_cfg = load_metadata(args.ocs_group)
+    ingest_csv_to_parquet(metadata_cfg, args.ocs_group)
+    logger.info('CSV ingestion completed for %s', args.ocs_group)
         
