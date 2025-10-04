@@ -1,9 +1,9 @@
-Atlas Insights – Data Ingestion & Streaming Microservice
+Atlas Insights – Data Ingestion & Big Data Analytics Framework
 =======================================================
 
 Comprehensive, metadata‑driven ingestion framework for big data analytics.:
 
-Currently supports three primary ingestion patterns:
+Currently Data Ingestion module is implemented for three primary source types (Downstream applications such as Reporting and recommendation services are yet to be implemented):
 
 * File system (CSV ➜ Parquet on HDFS)
 * Relational databases (MySQL / PostgreSQL / SQL Server ➜ Parquet on HDFS)
@@ -29,22 +29,46 @@ See `docs/architecture.md` for a deeper component breakdown.
 * **Stateless Execution**: Each ingestion run is deterministic based on metadata JSON.
 * **Extensible**: Add new source types (API, object storage) or sinks (Delta Lake, Iceberg) with minimal coupling.
 
----
-## 📦 Repository Layout
+## Overview of the system
 
-| Path | Purpose |
-|------|---------|
-| `src/ingestion/csv_ingestion.py` | Ingest CSV defined in metadata to HDFS Parquet |
-| `src/ingestion/rdbms_ingestion.py` | Ingest relational table(s) to Parquet |
-| `src/ingestion/streaming_sub.py` | (Placeholder) potential streaming consumer logic |
-| `src/kafka_api_pub/publisher_api.py` | FastAPI WebSocket endpoint that validates JSON and publishes to Kafka |
-| `src/providers/hdfs_service.py` | HDFS + Parquet write utilities |
-| `src/providers/rdbms_service.py` | DB connection + generic batch fetch abstraction |
-| `src/utils/common_util_func.py` | Metadata loader + schema builder |
-| `src/config/*.json` | Metadata configs (one per ocs group) |
-| `requirements.txt` | Python dependencies |
+This Data ingestion framework is design to ingest data from variable types of sources to HDFS file system. As mentioned above currently the ingestion is implemented for File system type (CSV), Relational database systems and Streaming data via KAFKA.
 
----
+### File system type
+
+Currently, the supported file type is **CSV**. In the future, more file types will be implemented.
+
+The following is the flow of CSV ingestion:
+
+1. Read metadata from the local filesystem (for CSV-based ingestion, the metadata file is named `ocs_group_fs.json`).
+    >💡 **Note**: To configure a CSV-based data source, the metadata file name should follow the format: `ocs_group_name_fs`.
+2. Read the set of files defined in the metadata configuration.
+3. Filter only the columns that need to be ingested.
+4. Convert the filtered dataset into **Parquet** format.
+5. Load the data into the HDFS filesystem (the HDFS path needs to be configured in the metadata).
+
+### RDBMS Ingestion
+
+Currently supports postgresql, mysql/mariadb and mssql RDBMS types.
+
+The following is the flow of RDBMS ingestion
+
+1. Read metadata from the local filesystem (for RDBMS based ingestion, the metadata file is named `ocs_group_rdbms.json`).
+    >💡 **Note**: To configure a RDBMS based data source, the metadata file name should follow the format: `ocs_group_rdbms`.
+2. Read the set of tables defined in the metadata with the filter columns.
+3. Convert the filtered dataset into **Parquet** format.
+4. Load the data into the HDFS filesystem (the HDFS path needs to be configured in the metadata).
+
+### Streaming via KAFKA
+
+A WebSocket-based API has been created to publish events to a specific topic (which can be passed as a query parameter), and a subscriber pipeline has been established from a Kafka broker to the HDFS file system.
+
+The following is the flow of the KAFKA streaming pipeline
+
+1. Publisher application(Data source) sends an event through the web socket API.
+2. Back-end validates the data coming from the publisher application(Uses the metadata configuration).
+3. Once validated backend publishes the event to the respective KAFKA topic mentioned in the query parameter.
+4.  HDFS sink connector loads the events in the topic to the relevant path in the HDFS file system(Topic and the batch size can be configured via metadata).
+
 ## 🧾 Metadata Specification (Summary)
 
 Each metadata file adheres to this high-level schema (see `docs/metadata_schema.md` for full detail):
@@ -183,13 +207,7 @@ Pending implementation. Recommended layers:
 ---
 ## 🔧 Extending the Framework
 
-| Extension | How |
-|-----------|-----|
-| New Source (e.g. REST API) | Add ingestion module producing `Iterable[List[Dict]]` batches compatible with `write_parquet_dataset` |
-| Alternate Sink (e.g. S3) | Implement new provider using `pyarrow.fs.S3FileSystem` |
-| Partitioned Output | Replace single-file writer with dataset partition writing (`pq.write_to_dataset`) using partition columns |
-| Transformations | Populate `transformations` array objects (e.g. simple projection, casts) & apply pre‑write |
-| Schema Evolution | Maintain versioned metadata; detect diffs & apply migrations |
+
 
 ---
 ## 🐛 Known Gaps / TODO
@@ -245,13 +263,6 @@ Open an issue or reach maintainer(s). Include:
 
 ---
 ## 🔮 Roadmap (Illustrative)
-* [ ] Add JSONSchema validation for metadata
-* [ ] Implement streaming consumer to persist Kafka → HDFS
-* [ ] Partitioned Parquet & dataset statistics
-* [ ] pluggable transformation engine
-* [ ] Metrics & Prometheus endpoint
-* [ ] Airflow / Dagster orchestration examples
-* [ ] Docker Compose stack (HDFS, Kafka, API)
 
 ---
 ## 📚 Additional Documentation
