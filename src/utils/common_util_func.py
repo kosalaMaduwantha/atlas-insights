@@ -17,6 +17,7 @@ _PYARROW_TYPE_MAP = {
 	'string': pa.string(),
 	'text': pa.string(),
 	'datetime': pa.timestamp('s'),  # store as seconds precision timestamp
+	'date': pa.date32(),
 	'timestamp': pa.timestamp('s'),
 }
 

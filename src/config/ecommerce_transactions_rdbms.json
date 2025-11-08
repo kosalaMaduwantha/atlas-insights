@@ -18,7 +18,7 @@
                 "primary_key": "transaction_id",
                 "path": "ecommerce_transactions",
                 "features":[
-                    {"name": "InvoiceNo", "dtype": "int"},
+                    {"name": "InvoiceNo", "dtype": "string"},
                     {"name": "StockCode", "dtype": "string"},
                     {"name": "Description", "dtype": "string"},
                     {"name": "Quantity", "dtype": "int"},
@@ -32,9 +32,9 @@
             "destination": {
                 "name": "ecommerce_transactions_warehouse",
                 "primary_key": "transaction_id",
-                "path": "/data/warehouse/ecommerce_transactions_db",
+                "path": "/data/warehouse/ecommerce_transactions/rdbms",
                 "features":[
-                    {"name": "InvoiceNo", "dtype": "int"},
+                    {"name": "InvoiceNo", "dtype": "string"},
                     {"name": "StockCode", "dtype": "string"},
                     {"name": "Description", "dtype": "string"},
                     {"name": "Quantity", "dtype": "int"},

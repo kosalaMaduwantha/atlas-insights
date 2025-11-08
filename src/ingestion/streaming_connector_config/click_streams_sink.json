@@ -3,8 +3,8 @@
   "config": {
     "connector.class": "io.confluent.connect.hdfs3.Hdfs3SinkConnector",
     "tasks.max": "3",
-    "topics": "ecommerce_transactions",
-    "hdfs.url": "hdfs://localhost:9000/user/kosala/input/click_streams",
+    "topics": "ecommerce_transactions_streaming",
+    "hdfs.url": "hdfs://localhost:9000/data/warehouse/ecommerce_transactions/streaming",
     "flush.size": "10",
     "confluent.topic.bootstrap.servers": "localhost:9092"
   }

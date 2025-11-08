@@ -45,6 +45,9 @@ def ingest_rdbms_to_parquet(
 				features = source.get('features', [])
 				column_names = [f['name'] for f in features]
 				schema = build_schema(features)
+				print("debug------")
+				print("schema: ", schema)
+				print("debug------")
 				dest_path = destination.get('path')
 				if not dest_path:
 					raise ValueError('Destination path not specified in metadata')

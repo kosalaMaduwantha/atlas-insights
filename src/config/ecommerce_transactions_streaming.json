@@ -7,9 +7,9 @@
     "dataset_config": [
         {
             "source": {
-                "name": "ecommerce_transactions_stream",
+                "name": "ecommerce_transactions_streaming",
                 "primary_key": "transaction_id",
-                "path": "ecommerce_transactions",
+                "path": "/data/warehouse/ecommerce_transactions/streaming",
                 "features":[
                     {"name": "event_time", "dtype": "datetime"},
                     {"name": "event_type", "dtype": "string"},

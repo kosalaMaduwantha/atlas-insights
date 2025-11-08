@@ -28,7 +28,7 @@
             "destination": {
                 "name": "ecommerce_transactions",
                 "primary_key": "transaction_id",
-                "path": "/data/warehouse/ecommerce_transactions",
+                "path": "/data/warehouse/ecommerce_transactions/fs",
                 "features":[
                     {"name": "Transaction_ID", "dtype": "int"},
                     {"name": "User_Name", "dtype": "string"},
@@ -37,7 +37,7 @@
                     {"name": "Product_Category", "dtype": "string"},
                     {"name": "Purchase_Amount", "dtype": "float"},
                     {"name": "Payment_Method", "dtype": "string"},
-                    {"name": "Transaction_Date", "dtype": "date"}
+                    {"name": "Transaction_Date", "dtype": "datetime"}
                 ]
             }
         }

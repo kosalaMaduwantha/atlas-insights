@@ -2,6 +2,7 @@ import logging
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pyarrow.fs as pafs
+import datetime
 from typing import Dict, Iterable, List
 
 logger = logging.getLogger(__name__)
