@@ -3,3 +3,5 @@ resources/prod/target/*
 env/
 cache-directory/
 data/
+# ignore pycache files
+**/__pycache__/
