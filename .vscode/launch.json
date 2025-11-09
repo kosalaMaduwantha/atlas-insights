@@ -21,6 +21,31 @@
       ]
     },
     {
+      "name": "Debug: FS Ingestion Pipeline",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/ingestion/csv_ingestion.py",
+      "console": "integratedTerminal",
+      // "preLaunchTask": "setting-classpath",
+      "justMyCode": false,
+      "args": [
+        "--ocs", "ecommerce_transactions_fs"
+      ]
+    },
+    {
+      "name": "Debug: Streaming Ingestion Pipeline",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/ingestion/streaming_sub.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "args": [
+        "--topic", "ecommerce_transactions_streaming",
+        "--ocs", "ecommerce_transactions_streaming",
+        "--batch-size", "1"
+      ]
+    },
+    {
       "type": "java",
       "name": "Debug JUnit Test",
       "request": "launch",
