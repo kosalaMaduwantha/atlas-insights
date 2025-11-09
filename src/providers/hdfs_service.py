@@ -3,6 +3,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pyarrow.fs as pafs
 import datetime
+import pandas as pd
 from typing import Dict, Iterable, List
 
 logger = logging.getLogger(__name__)
@@ -55,11 +56,23 @@ def write_parquet_dataset(
  
 def _rows_to_table(rows: List[Dict], schema: pa.schema) -> pa.Table:
 	"""Reorganize rows by column preserving order of schema fields"""
-	columns = {}
-	for field in schema:
-		values = []
-		for r in rows:
-			values.append(r.get(field.name))
-		array = pa.array(values, type=field.type, from_pandas=True)
-		columns[field.name] = array
+	try:
+		columns = {}
+		for field in schema:
+			values = []
+			for r in rows:
+				values.append(r.get(field.name))
+			
+			# Handle timestamp conversion from string
+			if pa.types.is_timestamp(field.type):
+				# Convert string datetime to pandas datetime, then to pyarrow
+				values = pd.to_datetime(values, errors='coerce')
+				array = pa.array(values, type=field.type)
+			else:
+				array = pa.array(values, type=field.type, from_pandas=True)
+			
+			columns[field.name] = array
+	except Exception as e:
+		logger.error(f"Error converting rows to table: {e}")
+		raise e
 	return pa.table(columns, schema=schema)
