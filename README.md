@@ -5,11 +5,12 @@ Comprehensive, metadata‑driven ingestion framework for big data analytics.:
 
 Currently Data Ingestion module is implemented for three primary source types (Downstream applications such as Reporting and recommendation services are yet to be implemented):
 
-* File system (CSV ➜ Parquet on HDFS)
-* Relational databases (MySQL / PostgreSQL / SQL Server ➜ Parquet on HDFS)
+* File system (CSV ➜ ORC format on HDFS)
+* Relational databases (MySQL / PostgreSQL / SQL Server ➜ ORC format on HDFS)
 * Streaming (WebSocket JSON ➜ Kafka topics – foundation for near‑real‑time ingestion)
+* Load data(ingested ORC) into Hive external tables.
 
-Built with Python, PyArrow, FastAPI, and Kafka; designed to standardize how raw operational data is landed into an analytics‑friendly lake/warehouse zone (HDFS Parquet) using a **single metadata contract**.
+Built with Python, PyArrow, FastAPI, and Kafka; designed to standardize how raw operational data is landed into an analytics‑friendly lake/warehouse zone (HDFS ORC format) using a **single metadata contract**.
 
 ---
 ## 🗺️ High-Level Architecture
@@ -25,7 +26,7 @@ See `docs/architecture.md` for a deeper component breakdown.
 * **Unified Schema Builder**: `build_schema()` maps declared logical dtypes to PyArrow schema.
 * **Pluggable Sources**: File system & RDBMS implemented; streaming scaffold present.
 * **Batch Efficiency**: RDBMS ingestion streams fetches (`fetch_many`) with configurable fetch size.
-* **HDFS Optimized Write**: Single Parquet writer per dataset; appends row batches sequentially.
+* **HDFS Optimized Read**: ORC format is optimized for read performance in HDFS.
 * **Stateless Execution**: Each ingestion run is deterministic based on metadata JSON.
 * **Extensible**: Add new source types (API, object storage) or sinks (Delta Lake, Iceberg) with minimal coupling.
 
@@ -43,7 +44,7 @@ The following is the flow of CSV ingestion:
     >💡 **Note**: To configure a CSV-based data source, the metadata file name should follow the format: `ocs_group_name_fs`.
 2. Read the set of files defined in the metadata configuration.
 3. Filter only the columns that need to be ingested.
-4. Convert the filtered dataset into **Parquet** format.
+4. Convert the filtered dataset into **ORC** format.
 5. Load the data into the HDFS filesystem (the HDFS path needs to be configured in the metadata).
 
 ### RDBMS Ingestion
@@ -55,7 +56,7 @@ The following is the flow of RDBMS ingestion
 1. Read metadata from the local filesystem (for RDBMS based ingestion, the metadata file is named `ocs_group_rdbms.json`).
     >💡 **Note**: To configure a RDBMS based data source, the metadata file name should follow the format: `ocs_group_rdbms`.
 2. Read the set of tables defined in the metadata with the filter columns.
-3. Convert the filtered dataset into **Parquet** format.
+3. Convert the filtered dataset into **ORC** format.
 4. Load the data into the HDFS filesystem (the HDFS path needs to be configured in the metadata).
 
 ### Streaming via KAFKA
@@ -67,7 +68,7 @@ The following is the flow of the KAFKA streaming pipeline
 1. Publisher application(Data source) sends an event through the web socket API.
 2. Back-end validates the data coming from the publisher application(Uses the metadata configuration).
 3. Once validated backend publishes the event to the respective KAFKA topic mentioned in the query parameter.
-4.  HDFS sink connector loads the events in the topic to the relevant path in the HDFS file system(Topic and the batch size can be configured via metadata).
+4. A subscriber application listens to the KAFKA topic and writes the data to the HDFS file system in ORC format(batch size can be configured. if the messages up to the batch size is accumulated the subscriber application will write them to HDFS in ORC format).
 
 ## 🧾 Metadata Specification (Summary)
 
@@ -191,13 +192,13 @@ Add to shell or `.env` (if integrating python-dotenv for auto‑loading).
 * WebSocket API validates incoming JSON fields exist.
 * Publishes to Kafka; no persistence pipeline yet from Kafka ➜ HDFS (future enhancement).
 
-### Parquet Writing
+### ORC Writing
 * Reorders row dicts to match schema field order.
-* Writes one consolidated file: `<destination_path>/<dataset_name>.parquet`.
+* Writes one consolidated file: `<destination_path>/<dataset_name>.orc`.
 * Creates HDFS directory if absent.
 
 ---
-## 🧪 Testing Strategy (Suggested)
+## 🧪 Testing Strategy
 
 Pending implementation. Recommended layers:
 * Unit: schema mapping, metadata loading, identifier quoting per DB.
@@ -238,33 +239,9 @@ Recommend adding:
 ---
 ## 🗃️ Versioning & Data Lifecycle
 Currently single overwrite semantics. To enable time travel or retention:
-1. Write to dated folders: `/data/warehouse/<dataset>/ingest_date=YYYY-MM-DD/part-*.parquet`.
+1. Write to dated folders: `/data/warehouse/<dataset>/ingest_date=YYYY-MM-DD/part-*.orc`.
 2. Introduce a manifest table or Hive/Trino metastore integration.
 
----
-## 🤝 Contributing
-1. Fork & branch (`feat/<short-name>`).
-2. Add or update metadata & code.
-3. Add/update docs & (future) tests.
-4. Submit PR with concise description & before/after notes.
-
-Code style: prefer explicit imports, small pure functions, early validation.
-
----
-## 📄 License
-Specify license terms here (currently unspecified).
-
----
-## 💬 Support / Help
-Open an issue or reach maintainer(s). Include:
-* Metadata file used
-* Command executed
-* Stack trace (if any)
-
----
-## 🔮 Roadmap (Illustrative)
-
----
 ## 📚 Additional Documentation
 See:
 * `docs/architecture.md`
