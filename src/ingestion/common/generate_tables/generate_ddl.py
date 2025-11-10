@@ -29,7 +29,7 @@ def create_hive_table_ddls(ocs_group_name: str) -> List[str]:
     return [ddl_file_path]
 
 if __name__ == "__main__":
-    ocs_group = "ecommerce_transactions_fs"
+    ocs_group = "ecommerce_transactions_rdbms"
     ddl_files = create_hive_table_ddls(ocs_group)
     print(f"Hive DDL files created: {ddl_files}")
     print("DDL Statements:")

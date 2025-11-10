@@ -12,7 +12,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pyarrow.fs as pafs
 from src.utils.common_util_func import build_schema, load_metadata
-from src.providers.hdfs_service import write_parquet_dataset
+from src.providers.hdfs_service import write_parquet_dataset, write_orc_dataset
 from src.providers.rdbms_service import connect_db, fetch_batches
 try:  # optional imports for postgres
 	import psycopg2
@@ -54,7 +54,7 @@ def ingest_rdbms_to_parquet(
 				)
 
 				batches = fetch_batches(conn, table_path, column_names, db_type=norm_db, fetch_size=fetch_size)
-				write_parquet_dataset(
+				write_orc_dataset(
 					batches=batches,
 					schema=schema,
 					dataset_name=dataset_name,
