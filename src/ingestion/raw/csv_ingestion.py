@@ -6,7 +6,7 @@ import pyarrow.csv as pv
 import logging
 from src.config.config import HDFS_HOST, HDFS_PORT
 from src.utils.common_util_func import build_schema, load_metadata
-from src.providers.hdfs_service import write_parquet_dataset
+from src.providers.hdfs_service import write_parquet_dataset, write_orc_dataset
 import os
 import json
 
@@ -45,7 +45,7 @@ def ingest_csv_to_parquet(
         # Wrap in a list to match Iterable[List[Dict]]
         batches = [batch_dicts]
 
-        write_parquet_dataset(
+        write_orc_dataset(
             batches=batches,
             schema=schema,
             dataset_name=dataset_name,

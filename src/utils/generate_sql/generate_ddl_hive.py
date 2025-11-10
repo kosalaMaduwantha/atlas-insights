@@ -9,9 +9,20 @@ HIVE_TYPE_MAP = {
     'float': 'DECIMAL',
 }
 
+FILE_FORMAT_MAP = {
+    'parquet': 'PARQUET',
+    'orc': 'ORC',
+}
+
+COMPRESSION_MAP = {
+    'parquet': 'parquet.compression',
+    'orc': 'orc.compress',
+}
+
 def gen_hive_table_ddl(
     ocs_group_name: str, 
-    destination_metadata: Dict
+    destination_metadata: Dict,
+    file_format: str
 ) -> str:
 
     table_name = destination_metadata.get('name')
@@ -23,8 +34,8 @@ def gen_hive_table_ddl(
     for feature in features:
         ddl += f"    {feature.get('name')} {HIVE_TYPE_MAP.get(feature.get('dtype'), 'STRING')},\n"
     ddl = ddl.rstrip(",\n") + "\n) \n"
-    ddl += "STORED AS PARQUET\n"
+    ddl += f"STORED AS {FILE_FORMAT_MAP.get(file_format, 'PARQUET')}\n"
     ddl += f"LOCATION '{path}'\n"
-    ddl += "TBLPROPERTIES ('parquet.compression'='SNAPPY'); \n\n"
+    ddl += f"TBLPROPERTIES ('{COMPRESSION_MAP.get(file_format, 'parquet.compression')}'='SNAPPY'); \n\n"
     
     return ddl

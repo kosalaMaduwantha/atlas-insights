@@ -76,8 +76,8 @@ def write_orc_dataset(
 					continue
 				table = _rows_to_table(batch_rows, schema)
 				if writer is None:
-					writer = orc.ORCWriter(out_stream, table.schema)
-				writer.write_table(table)
+					writer = orc.ORCWriter(out_stream)
+				writer.write(table)
 		finally:
 			if writer is not None:
 				writer.close()

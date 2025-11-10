@@ -14,7 +14,11 @@ def create_hive_table_ddls(ocs_group_name: str) -> List[str]:
     for ds in dataset_configs:
         table_ddl = ""
         destination = ds.get('destination', {})
-        ddl = gen_hive_table_ddl(ocs_group_name, destination)
+        ddl = gen_hive_table_ddl(
+            ocs_group_name, 
+            destination,
+            'orc'  # assuming ORC format for this example
+        )
         table_ddl += ddl
         
     # store ddls in a sql file
