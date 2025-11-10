@@ -5,6 +5,7 @@ import pyarrow.fs as pafs
 import datetime
 import pandas as pd
 from typing import Dict, Iterable, List
+from pyarrow import orc
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s - %(message)s')
@@ -53,6 +54,35 @@ def write_parquet_dataset(
 				writer.close()
 
 	logger.info("Completed Parquet write: %s", file_path)
+ 
+def write_orc_dataset(
+	batches: Iterable[List[Dict]],
+	schema: pa.schema,
+	dataset_name: str,
+	destination_path: str,
+	hdfs_host: str,
+	hdfs_port: int,
+):
+	hdfs = _open_hdfs(hdfs_host, hdfs_port)
+	_ensure_hdfs_dir(hdfs, destination_path)
+	file_path = f"{destination_path.rstrip('/')}/{dataset_name}.orc"
+	logger.info("Writing ORC to HDFS: %s", file_path)
+
+	with hdfs.open_output_stream(file_path) as out_stream:
+		writer = None
+		try:
+			for batch_rows in batches:
+				if not batch_rows:
+					continue
+				table = _rows_to_table(batch_rows, schema)
+				if writer is None:
+					writer = orc.ORCWriter(out_stream, table.schema)
+				writer.write_table(table)
+		finally:
+			if writer is not None:
+				writer.close()
+
+	logger.info("Completed ORC write: %s", file_path)
  
 def _rows_to_table(rows: List[Dict], schema: pa.schema) -> pa.Table:
 	"""Reorganize rows by column preserving order of schema fields"""
